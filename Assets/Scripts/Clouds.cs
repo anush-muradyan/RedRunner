@@ -3,9 +3,10 @@ using UnityEngine;
 
 public class Clouds : MonoBehaviour
 {
-    [SerializeField]private float moveSpeed;
-    [SerializeField]private float changeDirectionSeconds;
+    [SerializeField] private float moveSpeed;
+    [SerializeField] private float changeDirectionSeconds;
     private float time;
+
     private void Start()
     {
         time = changeDirectionSeconds;
@@ -18,8 +19,8 @@ public class Clouds : MonoBehaviour
             moveSpeed = -moveSpeed;
             changeDirectionSeconds += time;
         }
+
         transform.Translate((moveSpeed * Time.deltaTime * Vector2.right));
     }
 
-    
 }
