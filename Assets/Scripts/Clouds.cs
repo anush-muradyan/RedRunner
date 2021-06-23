@@ -20,4 +20,6 @@ public class Clouds : MonoBehaviour
         }
         transform.Translate((moveSpeed * Time.deltaTime * Vector2.right));
     }
+
+    
 }

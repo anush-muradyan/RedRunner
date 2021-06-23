@@ -9,8 +9,11 @@ namespace DefaultNamespace
         [SerializeField] private float speed;
         [SerializeField] private LayerMask groundMask;
         [SerializeField] private float groundCollisionMinDistance;
-
+        // [SerializeField] private Player player;
+        
+        
         public bool IsGrounded { get; private set; }
+        public bool IsFalling => rigidbody2D.velocity.y < -0.18f;
 
         [SerializeField] public float jumpforce;
 
@@ -27,7 +30,7 @@ namespace DefaultNamespace
         {
             checkGround();
             Jump();
-
+            Debug.LogError(rigidbody2D.velocity.y);
         }
 
         private void checkGround()
