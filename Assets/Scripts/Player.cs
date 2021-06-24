@@ -1,22 +1,30 @@
+using System;
 using DefaultNamespace;
 using UnityEngine;
 
-public class Player : MonoBehaviour
+public class Player : MonoBehaviour,ILife
 {
     [SerializeField] private Animator animator;
+    [SerializeField] private float defaultLifeAmount = 100f;
+    [SerializeField] private Animation _animation;
     public CharacterController2D controller;
     private Collider2D collider2D;
 
-    private const string JUMP_KEY = "Jump";
-    private const string JUMP_INVERSE_KEY = "Jump_inverse";
-    private const string BLINK_KEY = "Blink";
-    private const string MOVEMENT_BLEND_TREE_KEY = "Movement";
-    private const string FALLING_KEY = "Falling";
-
     public float inputX;
+    public float Life { get; set; }
+
+    private void Awake()
+    {
+        Life = defaultLifeAmount;
+
+    }
 
     private void Update()
     {
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            _animation.Play("Rotateanim");
+        }
         inputX = Input.GetAxis("Horizontal");
 
         animator.SetFloat("Speed", inputX);
@@ -36,7 +44,6 @@ public class Player : MonoBehaviour
             transform.localScale = scale;
         }
 
-
         /*if (transform.localScale.x > 0f && input < 0)
         {
             transform.localScale = new Vector3(-transform.localScale.x, transform.localScale.y);
@@ -55,10 +62,28 @@ public class Player : MonoBehaviour
 */
     }
 
-
-    private void OnTriggerEnter2D(Collider2D other)
+    private void OnCollisionEnter2D(Collision2D other)
     {
-        Debug.Log("Dlflfk");
-        transform.position = new Vector3(other.transform.position.x, transform.position.y);
+        var unit = other.collider.GetComponent<IUnit>();
+        if (unit == null)
+        {
+            return;
+        }
+
+        
+        // switch (unit)
+        // {
+        //     case EnemyUnit enemyUnit:
+        //         enemyUnit.TakeDamage(this);
+        //         Debug.LogError(Life);
+        //         break;
+        //     default:
+        //         throw new ArgumentOutOfRangeException(nameof(unit));
+        // }
+    }
+
+    public void Die()
+    {
+        Destroy(gameObject);
     }
 }
