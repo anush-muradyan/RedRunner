@@ -2,13 +2,10 @@ namespace DefaultNamespace
 {
     public interface IUnit
     {
-        void TakeDamage(ILife life);
     }
-
-    public interface ILife
+    public interface IDamageable
     {
-        float Life { get; set; }
-
+        void TakeDamage(float amount);
         void Die();
     }
 }
