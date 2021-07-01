@@ -5,24 +5,44 @@ using UnityEngine.Events;
 public class Player : BaseDamageable, ILifeApply
 {
     [SerializeField] private Animator animator;
-    [SerializeField] public float defaultLifeAmount = 100f;
     [SerializeField] private Animation _animation;
     [SerializeField] private Camera camera;
     [SerializeField] Transform pivot;
     [SerializeField] private Transform shootPoint;
+    [SerializeField] private Bullet Bullet;
+    [SerializeField] public float defaultLifeAmount = 100f;
     public CharacterController2D controller;
-    [SerializeField] private Bullet shootingItem;
+    [SerializeField] private float viewAngle;
+    
     public UnityEvent OnShoot { get; } = new UnityEvent();
     public float inputX;
+    [SerializeField]private float rotationSpeed;
     public override float Life { get; protected set; }
-
+    private bool flag = true;
+    private float direction;
     private void Awake()
     {
-        
         Life = defaultLifeAmount;
     }
 
     private void Update()
+    {
+       setAnimation();
+        var dir = camera.ScreenToWorldPoint(Input.mousePosition) - pivot.position;
+
+        var angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+        var scale = transform.localScale;
+        direction = Mathf.Abs(scale.x) * (dir.x < 0f ? -1f : 1f);
+        scale.x = direction;
+        transform.localScale = scale;
+
+        PivotHolderRotation();
+        Shoot();
+
+    }
+
+
+    private void setAnimation()
     {
         if (Input.GetKeyDown(KeyCode.P))
         {
@@ -40,16 +60,6 @@ public class Player : BaseDamageable, ILifeApply
 
         animator.SetBool("IsMoveing", inputX != 0f);
 
-
-        if (inputX != 0)
-        {
-            var scale = transform.localScale;
-            scale.x = Mathf.Abs(scale.x) * (inputX < 0f ? -1f : 1f);
-            transform.localScale = scale;
-        }
-
-        PivotHolderRotation();
-        Shoot();
     }
 
     public void Apply(float value)
@@ -62,6 +72,8 @@ public class Player : BaseDamageable, ILifeApply
         {
             IncreaseLife(value);
         }
+
+        Debug.Log(Life);
     }
 
     public bool CanApply()
@@ -73,31 +85,29 @@ public class Player : BaseDamageable, ILifeApply
     {
         var mouse = camera.ScreenToWorldPoint(Input.mousePosition);
         mouse.z = 0f;
-        var pos = transform.position;
-        var clampValue = Mathf.Clamp(mouse.x, -30f, 30f);
+        var dir = (mouse - pivot.position);
+        var angle =  Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+        angle = Mathf.Clamp(angle, 0f, direction*viewAngle);  
 
-        pos.x = clampValue;
-        shootPoint.transform.position = Vector3.Lerp(shootPoint.transform.position, pos, Time.deltaTime * 50f);
-        var dir = mouse - pivot.position;
-
-        var angle = -90f + Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
-        angle = Mathf.Clamp(angle, 0f, 30f);
         pivot.rotation = Quaternion.Lerp(pivot.rotation, Quaternion.Euler(Vector3.forward * angle),
-            Time.deltaTime * 10f);
+            Time.deltaTime * rotationSpeed);
+
     }
 
     private void shoot()
     {
         var currentPos = camera.ScreenToWorldPoint(Input.mousePosition);
         var dir = currentPos - transform.position;
-        var bullet = Instantiate(shootingItem, shootPoint.position, Quaternion.identity);
+        var bullet = Instantiate(Bullet, shootPoint.position, Quaternion.identity);
         bullet.Shoot(dir);
 
         OnShoot?.Invoke();
     }
 
-    private void Shoot() {
-        if (!Input.GetMouseButtonDown(0)) {
+    private void Shoot()
+    {
+        if (!Input.GetMouseButtonDown(0))
+        {
             return;
         }
 
