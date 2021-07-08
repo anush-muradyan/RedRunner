@@ -15,7 +15,7 @@ TagManager:
   - Player
   - Wall
   - Enemy
-  - 
+  - WinFlag
   - 
   - 
   - 
@@ -39,6 +39,6 @@ TagManager:
   - 
   - 
   m_SortingLayers:
-  - name: Default
+  - name: WinFlag
     uniqueID: 0
     locked: 0

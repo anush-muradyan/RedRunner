@@ -1,10 +1,9 @@
-using System;
+using DefaultNamespace.IGameStates;
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace DefaultNamespace
 {
-    public class CharacterController2D : MonoBehaviour
+    public class CharacterController2D : MonoBehaviour, IStartGame, IGamePause, IGameResume,IGameRestart
     {
         [SerializeField] public Rigidbody2D rigidbody2D;
         [SerializeField] private float speed;
@@ -16,6 +15,8 @@ namespace DefaultNamespace
         public bool IsFalling => rigidbody2D.velocity.y < -0.18f;
 
         [SerializeField] public float jumpforce;
+        private bool started;
+        private bool pause;
 
         public void Move(float move)
         {
@@ -25,15 +26,38 @@ namespace DefaultNamespace
             rigidbody2D.velocity = vel;
         }
 
-
-
         private void Update()
         {
+            if (!started || pause)
+            {
+                return;  
+            }
+
             checkGround();
             Jump();
-            // Debug.LogError("Y " + rigidbody2D.velocity.y);
         }
 
+        public void PauseGame()
+        {
+            pause = true;
+        }
+
+        public void ResumeGame()
+        {
+            pause = false;
+        }
+
+        public void StartGame()
+        {
+            started = true;
+        }
+
+        public void RestartGame()
+        {
+            started = true;
+            pause = false;
+        }
+        
         private void checkGround()
         {
             var hitLeft = Physics2D.Raycast(transform.position - Vector3.right * 0.5f - Vector3.right * 0.05f,
@@ -54,8 +78,8 @@ namespace DefaultNamespace
             {
                 rigidbody2D.AddForce(jumpforce * Vector3.up, ForceMode2D.Impulse);
             }
-
         }
 
+        
     }
 }

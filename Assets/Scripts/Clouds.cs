@@ -1,11 +1,12 @@
-using System;
+using DefaultNamespace.IGameStates;
 using UnityEngine;
 
-public class Clouds : MonoBehaviour
+public class Clouds : MonoBehaviour,IGamePause,IGameResume
 {
     [SerializeField] private float moveSpeed;
     [SerializeField] private float changeDirectionSeconds;
     private float time;
+    private bool pause;
 
     private void Start()
     {
@@ -14,6 +15,10 @@ public class Clouds : MonoBehaviour
 
     private void Update()
     {
+        if (pause)
+        {
+            return;
+        }
         if (Time.time >= changeDirectionSeconds)
         {
             moveSpeed = -moveSpeed;
@@ -23,4 +28,13 @@ public class Clouds : MonoBehaviour
         transform.Translate((moveSpeed * Time.deltaTime * Vector2.right));
     }
 
+    public void PauseGame()
+    {
+        pause = true;
+    }
+
+    public void ResumeGame()
+    {
+        pause = false;
+    }
 }

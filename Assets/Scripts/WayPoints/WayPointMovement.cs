@@ -1,11 +1,9 @@
-using System;
-using System.Diagnostics;
+using DefaultNamespace.IGameStates;
 using UnityEngine;
-using Debug = UnityEngine.Debug;
 
-namespace DefaultNamespace
+namespace WayPoints
 {
-    public class WayPointMovement : MonoBehaviour
+    public class WayPointMovement : MonoBehaviour,IGamePause,IGameResume
     {
         [SerializeField] private WayPointSystem wayPointSystem;
 
@@ -15,15 +13,19 @@ namespace DefaultNamespace
         private Vector3 lastPoint;
         private float speed;
         private float step;
-        
+        private bool pause;
         
         private void Update()
         {
+            if (pause)
+            {
+                return;
+            }
+            
             Move();
         }
         
-
-        private Stopwatch _stopwatch;
+       
 
         private void Move()
         {
@@ -45,31 +47,17 @@ namespace DefaultNamespace
             var t = (d1 / d) + 0.01f;
             
             transform.position = Vector3.Lerp(transform.position, currentPoint, t * Time.deltaTime );
+            
+        }
 
+        public void PauseGame()
+        {
+            pause = true;
+        }
 
-            // if (currentPoint == null || )
-            // {
-            //     if (_stopwatch == null)
-            //     {
-            //         _stopwatch = new Stopwatch();
-            //         _stopwatch.Start();
-            //     }
-            //
-            //     if (_stopwatch != null)
-            //     {
-            //         _stopwatch.Stop();
-            //         Debug.LogError(_stopwatch.ElapsedMilliseconds);
-            //         _stopwatch = new Stopwatch();
-            //         _stopwatch.Start();
-            //     }
-            //   
-            //     currentPoint = wayPointSystem.GetNextPoint();
-            //     speed = wayPointSystem.GetDistance() / movementDuration;
-            //     Debug.Log(speed);
-            //     
-            // }
-            // step = speed * Time.deltaTime;
-            // transform.position = Vector3.Lerp(transform.position, currentPoint.position, step);
+        public void ResumeGame()
+        {
+            pause = false;
         }
     }
 }
